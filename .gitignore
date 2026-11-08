@@ -1,5 +1,0 @@
-*.pdf
-*.xlsx
-real*.json
-__pycache__/
-.DS_Store

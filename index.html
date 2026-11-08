@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CIBLens – CIB analysis and credit decision support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef1f5;--panel:#fff;--ink:#0b1f33;--muted:#5b6b7c;--line:#dce3ea;--accent:#0e7c86;--accent-soft:#e1f2f3;--gold:#b8862b;--navy:#0b1f33;--navy2:#13324f;
+--good:#2f8f5b;--warn:#c98a12;--bad:#c2412d;--sev:#8f1d2c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a141f;--panel:#12212f;--ink:#e7eef5;--muted:#8fa2b5;--line:#233749;--accent:#3fb6c0;--accent-soft:#12343a;--navy:#06111b;--navy2:#0d2a40}}
+:root[data-theme="dark"]{--bg:#0a141f;--panel:#12212f;--ink:#e7eef5;--muted:#8fa2b5;--line:#233749;--accent:#3fb6c0;--accent-soft:#12343a;--navy:#06111b;--navy2:#0d2a40}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3,.serif{font-family:Fraunces,"Iowan Old Style",Georgia,serif;font-weight:600;margin:0}
+h2{font-size:18px;margin-bottom:10px}
+.top{background:linear-gradient(100deg,var(--navy),var(--navy2));color:#fff;position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top,0px)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font:600 22px Fraunces,Georgia,serif;letter-spacing:.2px}
+.brand small{font:500 11px "Plus Jakarta Sans",sans-serif;opacity:.7;display:block;margin-top:-4px;letter-spacing:.3px}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav button{background:transparent;color:#cfe0ee;border:0;padding:8px 14px;border-radius:99px;font:600 13px inherit;cursor:pointer}
+nav button[aria-current="true"]{background:#fff;color:var(--navy)}
+nav button:hover:not([aria-current="true"]){background:rgba(255,255,255,.12)}
+button,.btn,select,input{font:inherit}
+button:focus-visible,.btn:focus-within,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:16px 16px 56px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.btn,.b{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;font-weight:600;font-size:13px}
+.b.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600}
+.chip button{border:0;background:none;color:inherit;cursor:pointer;padding:0 0 0 2px;font-size:15px;line-height:1}
+.hero{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;border-bottom:3px solid var(--gold);margin-bottom:14px}
+.hero h1{font-size:30px;line-height:1.15}
+.hero .meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;color:#b9cde0;font-size:13px}
+.hero .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.hero .tags span{background:rgba(255,255,255,.12);border-radius:99px;padding:3px 10px;font-size:12px}
+.gauge{text-align:center;min-width:190px}.gauge svg{width:190px;height:auto}.gauge b{display:block;font:600 13px "Plus Jakarta Sans";margin-top:-6px}
+@media(max-width:700px){.hero{grid-template-columns:1fr}.gauge{justify-self:start}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi span{display:block;color:var(--muted);font-size:12px;font-weight:500}
+.kpi b{display:block;font:600 22px Fraunces,Georgia,serif;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi i{font-style:normal;font-size:11.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.grid .card{margin:0}
+.row{display:grid;grid-template-columns:120px 1fr auto;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.row i{display:block;height:10px;border-radius:5px;background:var(--accent)}
+.row em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+.lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flag{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.flag:first-of-type{border-top:0}
+.dot{flex:0 0 9px;height:9px;border-radius:50%;margin-top:7px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:760px}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--muted);font-weight:600;font-size:12px}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.dim td{color:var(--muted)}
+.sub{color:var(--muted);font-size:12.5px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:26px;text-align:center;background:var(--panel);margin-bottom:14px}
+.drop b{font:600 18px Fraunces,Georgia,serif;display:block;margin-bottom:4px}
+.msg{font-size:13px;margin:0 0 12px;min-height:18px;color:var(--muted)}.msg.err{color:var(--bad)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+input[type=text],input[type=number],select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.dec{border-left:5px solid var(--accent)}
+.dec h3{font-size:20px}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.seg{display:flex;gap:2px;background:var(--bg);padding:3px;border-radius:9px;border:1px solid var(--line)}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:600;font-size:12.5px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+svg text{font-family:"Plus Jakarta Sans",system-ui,sans-serif}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="#fff" stroke-width="3"/><path d="M22.5 22.5 31 31" stroke="#b8862b" stroke-width="4" stroke-linecap="round"/><path d="M9.5 16.5l3.2 3.2 6-7.4" fill="none" stroke="#3fb6c0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div>CIBLens<small>Credit exposure intelligence</small></div></div>
+  <nav id="nav"></nav>
+</div></header>
+<main class="wrap">
+  <div class="drop" id="drop"><b>Upload CIB reports (PDF)</b><div class="sub">Add the borrower’s CIB, then the CIBs of related parties and guarantors. Files are read in your browser and are not uploaded anywhere.</div>
+    <div class="bar" style="justify-content:center;margin:12px 0 0"><label class="b p">Choose PDF files<input id="pdf" type="file" accept=".pdf,.json" multiple hidden></label></div></div>
+  <p class="msg" id="msg"></p>
+  <div class="bar" id="chips"></div>
+  <div id="view"></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* ============ helpers ============ */
+const $=s=>document.querySelector(s);
+const fmt=v=>Number(v||0).toLocaleString('en-IN');
+const cr=v=>Math.abs(v)>=1e7?(v/1e7).toFixed(2)+' Cr':Math.abs(v)>=1e5?(v/1e5).toFixed(2)+' L':fmt(v);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sum=(l,k)=>l.reduce((a,f)=>a+(f[k]||0),0);
+const D=s=>s?new Date(s+'T00:00:00'):null;
+const dd=(a,b)=>Math.round((a-b)/864e5);
+const ym=s=>s.slice(0,7);
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const mlabel=k=>MON[+k.slice(5,7)-1]+' '+k.slice(2,4);
+const CLS={UC:['Standard','--good'],SMA:['Special Mention','--warn'],SS:['Sub-standard','--bad'],DF:['Doubtful','--bad'],BL:['Bad / Loss','--sev'],BLW:['Written off','--sev']};
+const BAD=['SS','DF','BL','BLW'];
+let S={cibs:[],act:0,tab:'overview',stmt:null,limit:0,scope:'live',q:''};
+
+/* ============ PDF → structured CIB ============ */
+const XS=294; // x-position (pt) where the right-hand "Contract history" column starts
+function itemsToLines(items){
+  const pg={};items.forEach(i=>(pg[i.p]=pg[i.p]||[]).push(i));const out=[];let xs=XS;
+  Object.keys(pg).sort((a,b)=>a-b).forEach(p=>{
+    const it=pg[p].filter(i=>i.s.trim()).sort((a,b)=>a.y-b.y||a.x-b.x),rows=[];let cur=null;
+    it.forEach(i=>{if(cur&&Math.abs(i.y-cur.y)<=3)cur.a.push(i);else{cur={y:i.y,a:[i]};rows.push(cur)}});
+    rows.forEach(r=>{r.a.sort((a,b)=>a.x-b.x);const mg=[];r.a.forEach(i=>{const q=mg[mg.length-1];if(q&&i.w!=null&&i.x-q.e<5&&i.x>=q.x){q.s+=' '+i.s.trim();q.e=i.x+i.w}else mg.push({x:i.x,s:i.s.trim(),e:i.x+(i.w||0)})});r.a=mg});
+    const hx=rows.flatMap(r=>r.a).filter(i=>i.x>200&&/^(Contract|Contribution) History/.test(i.s)).map(i=>i.x);if(hx.length)xs=Math.min(...hx)-6;
+    rows.forEach(r=>out.push({l:r.a.filter(i=>i.x<xs).map(i=>i.s).join('   '),r:r.a.filter(i=>i.x>=xs).map(i=>i.s).join('   ')}));
+  });return out;
+}
+const isoD=d=>d?d.split('/').reverse().join('-'):'';
+const nn=s=>s?+String(s).replace(/,/g,''):0;
+function shortType(f){f=f.trim();for(const[p,s]of[['PAD/BLC/BE','PAD/BLC/BE loan'],['Export loan','Export loan'],['Guarantee','Guarantee (non-funded)'],['Credit Card','Credit Card'],['Demand Loan','Demand Loan'],['Financial','Financial Leasing'],['Term','Term Loan'],['Cash Credit','Cash Credit'],['Overdraft','Overdraft']])if(f.startsWith(p))return s;return f}
+function parseCib(lines){
+  const full=lines.map(x=>x.l+(x.r?'   '+x.r:'')),txt=full.join('\n'),g=(rx,t)=>{const m=(t||txt).match(rx);return m?m[1].trim():''};
+  const subject={name:g(/Name:\s+([A-Z][^\n]*?)(?:\s+Verified|\s{3,}|\n)/),cibId:g(/CIB subject code:\s+([A-Z]\d{10})/),type:g(/Type of subject:\s+(\w+)/)};
+  subject.type=subject.type.charAt(0)+subject.type.slice(1).toLowerCase();
+  const di=g(/Date of Inquiry[\s\S]*?(\d{2}-[A-Za-z]{3}-\d{4})/);
+  subject.reportDate=di?`${di.slice(-4)}-${String(MON.indexOf(di.slice(3,6))+1).padStart(2,'0')}-${di.slice(0,2)}`:new Date().toISOString().slice(0,10);
+  const props={};for(const m of txt.matchAll(/Trade Name:\s+(.+?)(?:\s{3,}|\n)[\s\S]{0,300}?Code:([A-Z]\d{10})\)/g))props[m[2]]=m[1].trim();
+  subject.props=Object.entries(props);
+  const a=txt.indexOf('1. SUMMARY OF FACILITY'),b=txt.indexOf('2. SUMMARY OF FACILITY'),c=txt.indexOf('3. SUMMARY OF PRIVATE');
+  const sm=(x,y)=>{const t=txt.slice(x,y),f=rx=>{const m=t.match(rx);return m?nn(m[1]):0};return{inst:f(/No of reporting Institutes:\s+(\d+)/),live:f(/No of Living Contracts:\s+(\d+)/),out:f(/Total Outstanding Amount:\s+([\d,]+)/),od:f(/Total Overdue Amount:\s+([\d,]+)/),funded:f(/\(A\) SUMMARY OF THE FUNDED[\s\S]*?Total Outstanding Amount:\s+([\d,]+)/),nonf:f(/\(B\) SUMMARY OF THE NON-FUNDED[\s\S]*?Total Outstanding Amount:\s+([\d,]+)/)}};
+  const summary={borrower:sm(a,b),guarantor:sm(b,c)};
+  const heads=[],starts=[];full.forEach((l,i)=>{if(l.startsWith('DETAILS OF'))heads.push([i,l]);if(/^\s*Ref\s+FI code/.test(l))starts.push(i)});
+  const F=[];
+  starts.forEach((s,bi)=>{
+    const e=bi+1<starts.length?starts[bi+1]:lines.length,bl=lines.slice(s,e),blk=full.slice(s,e).join('\n'),left=bl.map(x=>x.l).join('\n');
+    const h=heads.filter(x=>x[0]<s).pop()[1],kind=/CREDIT/.test(h)?'card':/NONINST/.test(h)?'noninst':'inst';
+    const fac=(g(/Facility:\s+(.+)/,left).split(/\s{3,}/)[0]||'');
+    const num=rx=>nn(g(rx,left)),f={id:g(/\b([A-Z]\d{10})\b/,blk),subj:g(/Code:([A-Z]\d{10})/,blk),fi:g(/\(CIB Subject\s+(\S+)/,blk),role:g(/Role:\s+(\w+)/,left),
+      live:/Phase:\s+Living/.test(left),type:shortType(fac),funded:!/Guarantee/.test(fac),limit:num(/(?:Sanction Limit|Credit limit):\s+([\d,]+)/),sec:num(/Security Amount:\s+([\d,]+)/),tpg:num(/Third Party guarantee\s+([\d,]+)/),
+      start:isoD(g(/Starting date:\s+(\S+)/,left)),end:isoD(g(/End date of contract:\s+(\S+)/,left)),upd:isoD(g(/Date of Last Update:\s+(\S+)/,left)),hist:[],linked:[]};
+    const cut=bl.findIndex(x=>/Contribution History/.test(x.r));
+    bl.slice(0,cut<0?bl.length:cut).forEach(x=>{for(const m of x.r.matchAll(/(\d\d\/\d\d\/\d{4})\s+((?:[\d,]+\s+)+)([A-Z]{2,4})\s+(Yes|No)\b/g)){
+      const v=m[2].trim().split(/\s+/).map(nn);let o,od,lim=0;if(kind==='inst'&&v.length>=3){o=v[0];od=v[1]}else if(v.length>=3){lim=v[0];o=v[1];od=v[2]}else continue;
+      f.hist.push([isoD(m[1]),o,od,m[3]]);f.limit=f.limit||lim}});
+    const h0=f.hist[0];f.out=h0?h0[1]:0;f.od=h0?h0[2]:0;f.cls=!h0||h0[3]==='STD'?'UC':h0[3];
+    for(const m of left.matchAll(/([A-Z]\d{10})\s+(Borrower|Guarantor|Co-Borrower)\s+(.+?)(?:\s{3,}|$)/gm))f.linked.push([m[1],m[2],m[3].trim()]);
+    F.push(f)});
+  const names=Object.fromEntries(subject.props);names[subject.cibId]=subject.name;F.forEach(f=>f.subjName=names[f.subj]||f.subj);
+  if(!F.length)throw new Error('No facility records found – is this a Bangladesh Bank CIB report?');
+  return{subject,summary,facilities:F};
+}
+async function readPdf(file){
+  if(!window.pdfjsLib)throw new Error('PDF engine did not load – check your internet connection');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const doc=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,items=[];
+  for(let p=1;p<=doc.numPages;p++){say(`Reading ${file.name}: page ${p} of ${doc.numPages}…`);const tc=await(await doc.getPage(p)).getTextContent();
+    tc.items.forEach(t=>{if(t.str&&t.str.trim())items.push({p,x:t.transform[4],y:-t.transform[5],w:t.width,s:t.str})})}
+  return parseCib(itemsToLines(items));
+}
+
+/* ============ analysis ============ */
+function trendOf(c){
+  const own=c.facilities.filter(f=>f.role==='Borrower'&&f.funded),live=own.filter(f=>f.live),m={};
+  own.forEach(f=>f.hist.forEach(h=>{const k=ym(h[0]);m[k]=(m[k]||0)+h[1]}));
+  const lastOK=live.length?live.map(f=>f.hist.length?ym(f.hist[0][0]):'0').sort()[0]:Object.keys(m).sort().pop();
+  const keys=Object.keys(m).filter(k=>k<=lastOK).sort().slice(-12);return{rows:keys.map(k=>({k:mlabel(k),v:m[k]})),through:lastOK&&lastOK!=='0'?mlabel(lastOK):''};
+}
+function analyze(c){
+  const A=c.facilities,rd=D(c.subject.reportDate),own=A.filter(f=>f.role==='Borrower'&&f.live),gu=A.filter(f=>f.role==='Guarantor'&&f.live);
+  const m={c,all:A,own,gu,limit:sum(own,'limit'),out:sum(own,'out'),od:sum(own,'od'),gOut:sum(gu,'out')};
+  m.funded=sum(own.filter(f=>f.funded),'out');m.nonf=m.out-m.funded;m.badOut=sum(own.filter(f=>BAD.includes(f.cls)),'out');m.badPct=m.out?m.badOut/m.out*100:0;
+  const grp=(l,k)=>{const o={};l.forEach(f=>o[f[k]]=(o[f[k]]||0)+f.out);return Object.entries(o).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v)};
+  m.byType=grp(own,'type');m.byCls=grp(own,'cls').map(r=>({k:CLS[r.k]?CLS[r.k][0]:r.k,v:r.v,c:CLS[r.k]?CLS[r.k][1]:'--accent'}));m.trend=trendOf(c);
+  const rev=own.filter(f=>/overdraft|cash credit|card/i.test(f.type)&&f.limit);m.util=rev.length?sum(rev,'out')/sum(rev,'limit')*100:0;
+  const fl=[],add=(s,t)=>fl.push([s,t]);
+  own.forEach(f=>{const w=`${f.subjName} – ${f.type}`;
+    if(BAD.includes(f.cls))add('high',`${w} is classified ${f.cls} (BDT ${fmt(f.out)} outstanding).`);else if(f.cls==='SMA')add('med',`${w} is under Special Mention (SMA).`);
+    if(f.od>0)add('med',`${w} has overdue of BDT ${fmt(f.od)}.`);
+    if(f.limit&&f.out>f.limit*1.0001&&f.funded)add('med',`${w} outstanding (BDT ${fmt(f.out)}) exceeds the sanction limit (BDT ${fmt(f.limit)}).`)});
+  A.filter(f=>f.role==='Borrower'&&f.hist.length).forEach(f=>{const mx=f.hist.reduce((a,h)=>h[2]>a[2]?h:a,[0,0,0]);
+    if(mx[2]>0&&f.limit&&mx[2]/f.limit>=0.1)add('med',`${f.type} (${f.live?'live':'closed'}) showed overdue of BDT ${fmt(mx[2])} in ${mlabel(ym(mx[0]))}, later cleared, while reported STD.`);
+    if(f.hist.some(h=>h[3]==='SMA'))add('low',`${f.type} was reported SMA at least once in its 24-month history.`)});
+  if(m.util>90)add('med',`Revolving facilities are ${m.util.toFixed(0)}% utilised.`);
+  const sh=A.filter(f=>f.role==='Borrower'&&!f.live&&f.start&&f.end&&/demand|PAD/i.test(f.type)&&dd(D(f.end),D(f.start))<=125&&dd(rd,D(f.start))<=365);
+  if(sh.length>=6)add('med',`${sh.length} short-tenor demand/PAD contracts opened and closed in the last 12 months – a roll-over pattern worth testing against cash-flow.`);
+  if(c.summary.borrower.inst>=5)add('low',`Borrower reports facilities with ${c.summary.borrower.inst} institutions (multiple banking).`);
+  if(m.gOut>0)add('low',`Contingent exposure as guarantor: BDT ${fmt(m.gOut)} across ${gu.length} live contracts.`);
+  const o={high:0,med:1,low:2};fl.sort((a,b)=>o[a[0]]-o[b[0]]);m.flags=fl;
+  const nh=fl.filter(x=>x[0]==='high').length,nm=fl.filter(x=>x[0]==='med').length,nl=fl.filter(x=>x[0]==='low').length;
+  m.signal=Math.max(0,Math.round(100-Math.min(60,nh*20)-Math.min(24,nm*4)-Math.min(10,nl)-(m.util>90?5:0)-Math.min(40,m.badPct*1.5)));
+  m.band=m.signal>=85?['Low concern','--good']:m.signal>=65?['Moderate','--warn']:m.signal>=45?['Elevated','--bad']:['High risk','--sev'];
+  return m;
+}
+function related(){
+  const ids=new Set();S.cibs.forEach(c=>{ids.add(c.subject.cibId);c.subject.props.forEach(p=>ids.add(p[0]))});const m={};
+  S.cibs.forEach(c=>{const own=new Set([c.subject.cibId,...c.subject.props.map(p=>p[0])]);
+    c.facilities.forEach(f=>f.linked.forEach(([code,role,name])=>{if(own.has(code))return;const p=m[code]=m[code]||{code,name,rel:new Set(),n:0,live:0,out:0};p.n++;if(f.live){p.live++;p.out+=f.out}
+      p.rel.add(f.role==='Guarantor'&&role==='Borrower'?'Borrower we guarantee':f.role==='Borrower'&&role==='Guarantor'?'Guarantor of our facility':role==='Guarantor'?'Co-guarantor':'Co-borrower')}))});
+  return Object.values(m).map(p=>({...p,rel:[...p.rel],has:ids.has(p.code)})).sort((a,b)=>b.out-a.out||b.n-a.n);
+}
+function groupExposure(){
+  const direct={},cont={};S.cibs.forEach(c=>c.facilities.filter(f=>f.live).forEach(f=>{(f.role==='Guarantor'?cont:direct)[f.id]=f}));
+  Object.keys(direct).forEach(k=>delete cont[k]);const d=Object.values(direct),g=Object.values(cont);
+  const raw=sum(S.cibs.flatMap(c=>c.facilities.filter(f=>f.live)),'out');
+  return{direct:sum(d,'out'),nd:d.length,cont:sum(g,'out'),nc:g.length,dedup:raw-sum(d,'out')-sum(g,'out')};
+}
+
+/* ============ behaviour scoring (loan statement) ============ */
+function pd(v){if(v instanceof Date)return v;if(typeof v==='number')return new Date(Math.round((v-25569)*864e5));const s=String(v).trim();let m;
+  if(m=s.match(/^(\d{4})-(\d{2})-(\d{2})/))return new Date(+m[1],m[2]-1,+m[3]);if(m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/))return new Date(+m[3],m[2]-1,+m[1]);
+  if(m=s.match(/^(\d{1,2})[ \-]([A-Za-z]{3})[a-z]*[ \-,]+(\d{4})/))return new Date(+m[3],MON.findIndex(x=>x.toLowerCase()===m[2].toLowerCase()),+m[1]);return null}
+const AL={date:['date','transactiondate','valuedate','txndate'],desc:['description','particulars','narration','remarks','details'],dr:['debit','withdrawal','dr','drawdown','charge'],cr:['credit','deposit','cr','repayment','receipt'],bal:['balance','outstanding','closingbalance','runningbalance']};
+const nm=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
+function stmtRows(raw){return raw.map(r=>{const k=Object.keys(r),o={},f=a=>{const x=k.find(z=>a.includes(nm(z)));return x===undefined?'':r[x]};
+  o.d=pd(f(AL.date));o.desc=String(f(AL.desc));o.dr=nn(f(AL.dr)),o.cr=nn(f(AL.cr));const b=f(AL.bal);o.bal=b===''?null:nn(b);return o}).filter(o=>o.d&&!isNaN(o.d)).sort((a,b)=>a.d-b.d)}
+function scoreStmt(rows,limit){
+  if(rows.length<5)throw new Error('Need at least 5 dated transactions');let run=rows[0].bal!=null?rows[0].bal-rows[0].dr+rows[0].cr:0;rows.forEach(r=>{if(r.bal==null){run+=r.dr-r.cr;r.bal=run}else run=r.bal});
+  const d0=rows[0].d,d1=rows[rows.length-1].d,days=dd(d1,d0)+1,M={};let over=0,sumBal=0,peak=0,ri=0,cur=0;
+  for(let i=0;i<days;i++){const t=new Date(d0.getTime()+i*864e5);while(ri<rows.length&&rows[ri].d<=t){cur=rows[ri].bal;ri++}
+    const k=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0'),m=M[k]=M[k]||{k,n:0,s:0,cr:0,dr:0,pk:0,ov:0};m.n++;m.s+=cur;m.pk=Math.max(m.pk,cur);if(limit&&cur>limit){over++;m.ov++}sumBal+=cur;peak=Math.max(peak,cur)}
+  rows.forEach(r=>{const m=M[r.d.getFullYear()+'-'+String(r.d.getMonth()+1).padStart(2,'0')];m.cr+=r.cr;m.dr+=r.dr});
+  const ms=Object.values(M).map(m=>({...m,avg:m.s/m.n})),avg=sumBal/days,tcr=sum(rows,'cr'),tdr=sum(rows,'dr'),pen=rows.filter(r=>/penal|overdue|bounce|return|dishonou?r|default|excess/i.test(r.desc)).length;
+  const half=Math.max(1,Math.floor(ms.length/2)),a1=ms.slice(0,half).reduce((a,m)=>a+m.avg,0)/half,a2=ms.slice(-half).reduce((a,m)=>a+m.avg,0)/half,tr=a1?(a2-a1)/a1*100:0;
+  const util=limit?avg/limit*100:null,ovp=limit?over/days*100:0,cc=tdr?tcr/tdr:1,act=ms.filter(m=>m.cr>0).length/ms.length;
+  const cp=[];const P=(n,max,v,why)=>cp.push({n,max,v:Math.round(Math.max(0,Math.min(max,v))*10)/10,why});
+  P('Utilisation discipline',25,util==null?25*0.6:25*(1-Math.max(0,util-70)/30),util==null?'No limit entered – neutral score':`Average use ${util.toFixed(0)}% of limit (peak ${(peak/limit*100).toFixed(0)}%)`);
+  P('Limit breaches',20,limit?20*(1-ovp/8):20*0.6,limit?`${over} day(s) above limit (${ovp.toFixed(1)}% of period)`:'No limit entered – neutral score');
+  P('Repayment coverage',20,20*(cc-0.8)/0.18,`Credits are ${(cc*100).toFixed(0)}% of debits over ${ms.length} months`);
+  P('Account regularity',15,15*(act-0.5)/0.45,`${Math.round(act*ms.length)} of ${ms.length} months show repayments/credits`);
+  P('Penal / bounce events',10,10*(1-pen/3),`${pen} penal, overdue or return entr${pen===1?'y':'ies'}`);
+  P('Balance trend',10,10*(1-Math.max(0,tr)/20),`Average balance ${tr>=0?'up':'down'} ${Math.abs(tr).toFixed(0)}% (recent vs earlier half)`);
+  const sc=Math.round(sum(cp,'v')),gr=sc>=85?['A','--good']:sc>=70?['B','--good']:sc>=55?['C','--warn']:sc>=40?['D','--bad']:['E','--sev'];
+  return{score:sc,grade:gr,cp,ms,limit,avg,peak,from:d0,to:d1,rows:rows.length};
+}
+function sampleStmt(){let r=11,rnd=()=>(r=r*16807%2147483647)/2147483647,L=165e6,rows=[],prev=.8*L,T=120,pen=0;
+  for(let i=0;i<=T;i++){const d=new Date(2025,10,1+i*3),k=i/T,t=L*(.78+.2*k+(rnd()-.5)*.07),dl=Math.round((t-prev)/1e5)*1e5;let dr=Math.max(0,dl),c=Math.max(0,-dl),ds=dr?'Supplier payment – drawdown':'Customer receipt – repayment';
+    if(i>0&&d.getDate()<=3){dr+=1.2e6;ds='Interest and charges'}if(!pen&&prev+dr-c>L){dr+=5e5;pen=1;ds='Penal interest – excess over limit'}
+    prev+=dr-c;rows.push({d,desc:ds,dr,cr:c,bal:prev})}return rows}
+
+/* ============ rendering ============ */
+const say=(t,e)=>{const m=$('#msg');m.textContent=t||'';m.className='msg'+(e?' err':'')};
+const cur=()=>S.cibs[S.act];
+function gauge(v,label,col,txt){const L=Math.PI*80,f=Math.max(0,Math.min(100,v))/100*L;
+  return`<div class="gauge"><svg viewBox="0 0 180 110" role="img" aria-label="${esc(label)} ${esc(txt||v)}"><path d="M10 95A80 80 0 0 1 170 95" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="13" stroke-linecap="round"/><path d="M10 95A80 80 0 0 1 170 95" fill="none" stroke="var(${col})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${f} ${L}"/><text x="90" y="82" text-anchor="middle" font-size="38" font-weight="600" fill="#fff" style="font-family:Fraunces,Georgia,serif">${esc(txt||v)}</text></svg><b>${esc(label)}</b></div>`}
+const bars=(rows,col)=>{const mx=Math.max(1,...rows.map(r=>r.v));return rows.map(r=>`<div class="row"><span class="lab" title="${esc(r.k)}">${esc(r.k)}</span><i style="width:${Math.max(1,r.v/mx*100)}%;background:var(${r.c||col||'--accent'})"></i><em>${cr(r.v)}</em></div>`).join('')||'<span class="sub">No data</span>'};
+function colChart(rows,line,h=170){if(!rows.length)return'<span class="sub">No data</span>';const W=520,mx=Math.max(line||0,...rows.map(r=>r.v))*1.08||1,bw=W/rows.length;
+  return`<svg viewBox="0 0 ${W} ${h+26}" width="100%" role="img">${rows.map((r,i)=>{const bh=r.v/mx*h;return`<rect x="${i*bw+bw*.18}" y="${h-bh}" width="${bw*.64}" height="${bh}" rx="3" fill="var(--accent)"${r.o?' opacity=".95" style="fill:var(--bad)"':''}><title>${esc(r.k)}: BDT ${fmt(r.v)}</title></rect><text x="${i*bw+bw/2}" y="${h+16}" text-anchor="middle" font-size="10" fill="var(--muted)">${esc(r.k.slice(0,3))}</text>`}).join('')}${line?`<line x1="0" x2="${W}" y1="${h-line/mx*h}" y2="${h-line/mx*h}" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/><text x="${W-2}" y="${h-line/mx*h-4}" text-anchor="end" font-size="10" fill="var(--gold)">Limit</text>`:''}</svg>`}
+function decision(m){
+  const hasB=!!S.stmt,gb=hasB?S.stmt.grade[0]:null,hi=m.flags.some(f=>f[0]==='high')||m.badOut>0;let out,col,why=[];
+  if(hi){out='Decline or refer to credit committee';col='--sev';why.push('Classified exposure or high-severity CIB flags are present.')}
+  else if(m.signal<45||gb==='D'||gb==='E'){out='Refer for senior review';col='--bad';if(m.signal<45)why.push('CIB signal is below 45.');if(gb==='D'||gb==='E')why.push(`Account behaviour grade is ${gb}.`)}
+  else if(m.signal<80||gb==='C'){out='Proceed with conditions';col='--warn';why.push('No classified exposure, but medium-severity observations need clearing before approval.')}
+  else{out='Proceed within policy';col='--good';why.push('No adverse CIB findings.')}
+  const cond=[];if(m.all.some(f=>f.live&&f.end&&D(f.end)<D(m.c.subject.reportDate)))cond.push('Obtain renewal/extension evidence for live contracts shown past their end date.');
+  if(m.flags.some(f=>/overdue of BDT/.test(f[1])&&/later cleared/.test(f[1])))cond.push('Obtain reasons and settlement proof for past overdue on PAD/term facilities.');
+  if(related().some(p=>!p.has&&p.out>0))cond.push('Collect CIBs of un-uploaded related parties before fixing group exposure.');
+  if(!hasB)cond.push('Upload the existing-facility loan statement to complete behaviour scoring.');
+  if(m.gOut>0)cond.push('Include guarantor contingent exposure in the repayment-capacity assessment.');
+  return`<div class="card dec" style="border-left-color:var(${col})"><h2>Decision support (indicative)</h2><h3 style="color:var(${col})">${out}</h3><p class="sub" style="margin:6px 0 10px">${why.join(' ')} Rule-based aid only – the final decision rests with your credit policy and approving authority.</p>${cond.length?'<b>Suggested conditions</b><ul style="margin:6px 0 0;padding-left:18px">'+cond.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':''}</div>`}
+function vOverview(){
+  const c=cur(),m=analyze(c),g=groupExposure(),s=c.subject,sev={high:'--sev',med:'--warn',low:'--muted'};
+  const rows=m.all.filter(f=>S.scope==='all'||f.live).filter(f=>!S.q||(f.type+f.subjName+f.role+f.id).toLowerCase().includes(S.q.toLowerCase()));
+  return`<section class="hero"><div><h1>${esc(s.name)}</h1><div class="meta"><span>CIB ${esc(s.cibId)}</span><span>${esc(s.type)}</span><span>Report date ${esc(s.reportDate)}</span><span>${c.summary.borrower.inst} reporting institutions</span></div>
+  <div class="tags">${s.props.map(p=>`<span>${esc(p[1])}</span>`).join('')}</div></div>${gauge(m.signal,'CIB signal · '+m.band[0],m.band[1])}</section>
+  <div class="kpis">${[['Borrower outstanding',cr(m.out),`Funded ${cr(m.funded)} · Non-funded ${cr(m.nonf)}`],['Guarantor exposure',cr(m.gOut),`${m.gu.length} live contracts`],['Total exposure',cr(m.out+m.gOut),'Borrower + guarantor'],['Overdue today',cr(m.od),m.od?'Needs follow-up':'None reported'],['Classified outstanding',cr(m.badOut),m.badPct.toFixed(1)+'% of borrower exposure'],['Group exposure (all uploads)',cr(g.direct),`${S.cibs.length} CIB(s) · de-duplicated`]].map(k=>`<div class="kpi" title="BDT ${esc(k[1])}"><span>${k[0]}</span><b>${k[1]}</b><i>${k[2]}</i></div>`).join('')}</div>
+  <div class="grid"><div class="card"><h2>Funded outstanding, last 12 months</h2>${colChart(m.trend.rows)}<div class="sub">Through ${esc(m.trend.through)} – the latest month reported by every live funded contract.</div></div>
+  <div class="card"><h2>By facility type</h2>${bars(m.byType)}<h2 style="margin-top:16px">By classification</h2>${bars(m.byCls)}</div></div>
+  <div class="card"><h2>Risk flags (${m.flags.length})</h2>${m.flags.map(f=>`<div class="flag"><span class="dot" style="background:var(${sev[f[0]]})"></span><span>${esc(f[1])}</span></div>`).join('')||'<span class="sub">No flags raised.</span>'}</div>
+  ${decision(m)}
+  <div class="card"><h2>Contracts</h2><div class="tools"><div class="seg">${[['live','Live'],['all','All']].map(x=>`<button data-scope="${x[0]}" aria-pressed="${S.scope===x[0]}">${x[1]}</button>`).join('')}</div><input type="text" id="q" placeholder="Search type, subject, ID" value="${esc(S.q)}" style="min-width:220px"><span class="sub" style="align-self:center">${rows.length} shown</span></div>
+  <div class="scroll"><table><thead><tr><th>CIB subject</th><th>Type</th><th>Role</th><th class="n">Limit</th><th class="n">Outstanding</th><th class="n">Overdue</th><th>Class</th><th>Status</th><th>Start</th><th>End</th></tr></thead><tbody>${rows.map(f=>`<tr class="${f.live?'':'dim'}"><td>${esc(f.subjName)}</td><td>${esc(f.type)}</td><td>${f.role}</td><td class="n">${fmt(f.limit)}</td><td class="n">${fmt(f.out)}</td><td class="n">${fmt(f.od)}</td><td><span class="pill" style="background:var(${(CLS[f.cls]||[0,'--accent'])[1]})">${f.cls==='UC'?'STD':f.cls}</span></td><td>${f.live?'Live':'Closed'}</td><td>${f.start}</td><td>${f.end}</td></tr>`).join('')}</tbody></table></div></div>`}
+function concerns(){
+  const o=[];S.cibs.forEach(c=>{[[c.subject.cibId,c.subject.name,c.subject.type||'Individual',1],...c.subject.props.map(p=>[p[0],p[1],'Proprietorship concern',0])].forEach(([code,name,kind,main])=>{
+    const fs=c.facilities.filter(f=>f.subj===code),L=fs.filter(f=>f.live),b=L.filter(f=>f.role==='Borrower'),g=L.filter(f=>f.role==='Guarantor'),rev=b.filter(f=>/overdraft|cash credit|card/i.test(f.type)&&f.limit);
+    if(o.some(x=>x.code===code))return;o.push({code,name,kind,main,cib:c.subject.cibId,fs,b,g,out:sum(b,'out'),funded:sum(b.filter(f=>f.funded),'out'),nonf:sum(b.filter(f=>!f.funded),'out'),gOut:sum(g,'out'),od:sum(b,'od'),bad:sum(b.filter(f=>BAD.includes(f.cls)),'out'),util:rev.length?sum(rev,'out')/sum(rev,'limit')*100:null})})});
+  return o}
+function vParties(){
+  const C=concerns(),P=related(),g=groupExposure(),tot=sum(C,'out')||1,own=new Set(C.map(x=>x.code)),W=700,H=460,cx=W/2,cy=H/2;
+  const link={};S.cibs.forEach(c=>c.facilities.forEach(f=>f.linked.forEach(([code])=>{if(own.has(code)||!own.has(f.subj))return;(link[code]=link[code]||new Set()).add(f.subj)})));
+  const cn=C.map((x,i)=>{const a=-Math.PI/2+i*2*Math.PI/Math.max(1,C.length-1);return x.main?{...x,x:cx,y:cy,r:34}:{...x,x:cx+Math.cos(a)*105,y:cy+Math.sin(a)*105,r:26}});
+  const top=P.slice(0,12),pn=top.map((p,i)=>{const a=-Math.PI/2+(i+.5)*2*Math.PI/Math.max(1,top.length);return{...p,x:cx+Math.cos(a)*(W*.4),y:cy+Math.sin(a)*(H*.4)}}),by=Object.fromEntries(cn.map(x=>[x.code,x]));
+  const svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Concern map">${pn.flatMap(p=>[...(link[p.code]||[])].map(k=>by[k]?`<line x1="${by[k].x}" y1="${by[k].y}" x2="${p.x}" y2="${p.y}" stroke="var(${p.rel[0]==='Borrower we guarantee'?'--bad':'--accent'})" stroke-width="${Math.max(1.5,Math.min(6,Math.sqrt(p.out/1e6)/2))}" opacity=".55"/>`:'')).join('')}
+  ${cn.filter(x=>!x.main).map(x=>`<line x1="${cx}" y1="${cy}" x2="${x.x}" y2="${x.y}" stroke="var(--gold)" stroke-width="2.5"/>`).join('')}
+  ${cn.map(x=>`<circle cx="${x.x}" cy="${x.y}" r="${x.r}" fill="${x.main?'var(--navy)':'var(--gold)'}"/><text x="${x.x}" y="${x.y+3}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">${esc(x.name.replace(/^M\/S\.?\s*/i,'').slice(0,12))}</text><text x="${x.x}" y="${x.y+x.r+12}" text-anchor="middle" font-size="10" fill="var(--muted)">${cr(x.out)}</text>`).join('')}
+  ${pn.map(n=>`<circle cx="${n.x}" cy="${n.y}" r="20" fill="${n.has?'var(--accent)':'var(--panel)'}" stroke="var(--accent)" stroke-width="2"/><text x="${n.x}" y="${n.y+3}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${n.has?'#fff':'var(--ink)'}">${esc(n.name.slice(0,10))}</text><text x="${n.x}" y="${n.y+32}" text-anchor="middle" font-size="10" fill="var(--muted)">${cr(n.out)}</text>`).join('')}</svg>`;
+  const pill=x=>x.bad>0?['Classified','--sev']:x.od>0?['Overdue','--bad']:!x.fs.length?['No facilities','--muted']:x.util>90?['High utilisation','--warn']:['Regular','--good'];
+  const stat=(a,b)=>`<div><span class="sub">${a}</span><br><b>${b}</b></div>`;
+  return`<div class="kpis">${[['Group direct exposure',cr(g.direct),`${g.nd} borrower contracts, de-duplicated`],['Guarantor-only contingent',cr(g.cont),`${g.nc} contracts, borrower CIB not uploaded`],['Own concerns',C.length,`${C.filter(x=>x.out>0).length} with borrower exposure`],['Related parties',P.length,`${P.filter(p=>!p.has).length} CIB(s) still to collect`]].map(k=>`<div class="kpi"><span>${k[0]}</span><b>${k[1]}</b><i>${k[2]}</i></div>`).join('')}</div>
+  <div class="grid">${C.map(x=>{const p=pill(x);return`<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><h2 style="margin:0">${esc(x.name)}</h2><span class="sub">${esc(x.kind)} · ${esc(x.code)}</span></div><span class="pill" style="background:var(${p[1]})">${p[0]}</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">${stat('Borrower outstanding',cr(x.out))}${stat('Guarantor exposure',cr(x.gOut))}${stat('Funded',cr(x.funded))}${stat('Non-funded',cr(x.nonf))}${stat('Overdue',cr(x.od))}${stat('Live / total contracts',x.b.length+x.g.length+' / '+x.fs.length)}</div>
+  <div class="sub">${(x.out/tot*100).toFixed(0)}% of group borrower exposure${x.util!=null?' · revolving use '+x.util.toFixed(0)+'%':''}</div><div style="height:6px;background:var(--bg);border-radius:3px;margin-top:4px"><div style="height:6px;width:${x.out/tot*100}%;background:var(--gold);border-radius:3px"></div></div></div>`}).join('')}</div>
+  <div class="card"><h2>Concern map</h2>${svg}<div class="legend"><span><i style="background:var(--navy)"></i>Client</span><span><i style="background:var(--gold)"></i>Own concern</span><span><i style="background:var(--accent)"></i>Related party, CIB uploaded</span><span><i style="background:var(--bad)"></i>Borrower we guarantee</span></div></div>
+  <div class="card"><h2>Related parties linked through contracts</h2><p class="sub" style="margin-top:0">Upload the CIB of every party marked <b>Missing</b> to complete the group view.</p><div class="scroll"><table><thead><tr><th>Party</th><th>CIB subject</th><th>Relationship</th><th>Linked via</th><th class="n">Contracts</th><th class="n">Live outstanding</th><th>CIB</th></tr></thead><tbody>${P.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.code)}</td><td>${esc(p.rel.join(', '))}</td><td>${esc([...(link[p.code]||[])].map(k=>by[k]?by[k].name:k).join(', '))}</td><td class="n">${p.n}</td><td class="n">${fmt(p.out)}</td><td><span class="pill" style="background:var(${p.has?'--good':'--warn'})">${p.has?'Uploaded':'Missing'}</span></td></tr>`).join('')}</tbody></table></div></div>`}
+function vBehaviour(){
+  const c=cur(),rev=c.facilities.filter(f=>f.live&&f.role==='Borrower'&&/overdraft|cash credit/i.test(f.type)).sort((a,b)=>b.limit-a.limit)[0],b=S.stmt;
+  return`<div class="card"><h2>Existing-client behaviour scoring</h2><p class="sub" style="margin-top:0">Upload the account/loan statement (CSV or Excel) with <b>Date, Description, Debit, Credit, Balance</b>. Balance = amount outstanding. At least 6–12 months gives a reliable score.</p>
+  <div class="tools"><label class="b p">Upload statement<input id="stmt" type="file" accept=".csv,.xlsx,.xls" hidden></label><button class="b" id="stmtDemo">Use sample statement</button><button class="b" id="stmtTpl">Download template</button>
+  <label class="sub" style="align-self:center">Sanction limit (BDT) <input type="number" id="lim" value="${S.limit||''}" placeholder="${rev?rev.limit:''}" style="width:150px"></label></div></div>
+  ${b?`<section class="hero"><div><h1>Behaviour grade ${b.grade[0]}</h1><div class="meta"><span>${b.rows} transactions</span><span>${b.from.toLocaleDateString('en-GB')} – ${b.to.toLocaleDateString('en-GB')}</span><span>Average balance BDT ${fmt(b.avg)}</span><span>Peak BDT ${fmt(b.peak)}</span></div></div>${gauge(b.score,'Behaviour score',b.grade[1])}</section>
+  <div class="grid"><div class="card"><h2>Average balance by month</h2>${colChart(b.ms.map(m=>({k:mlabel(m.k),v:m.avg,o:b.limit&&m.ov>0})),b.limit)}<div class="legend"><span><i style="background:var(--bad)"></i>Months with limit breach</span></div></div>
+  <div class="card"><h2>Score components</h2>${b.cp.map(x=>`<div style="margin:9px 0"><div style="display:flex;justify-content:space-between;font-weight:600"><span>${x.n}</span><span>${x.v} / ${x.max}</span></div><div style="height:7px;background:var(--bg);border-radius:4px"><div style="height:7px;width:${x.v/x.max*100}%;background:var(--accent);border-radius:4px"></div></div><div class="sub">${esc(x.why)}</div></div>`).join('')}</div></div>`:'<div class="card sub">No statement loaded yet. Use the sample statement to preview the scoring.</div>'}`}
+function vExport(){return`<div class="card"><h2>Export</h2><p class="sub" style="margin-top:0">One workbook with summary, contracts, concerns, related parties, risk flags and (if loaded) behaviour scoring.</p><button class="b p" id="xl">Download Excel report</button></div>`}
+function render(){
+  $('#nav').innerHTML=[['overview','Overview'],['parties','Concerns & parties'],['behaviour','Behaviour'],['export','Export']].map(t=>`<button data-tab="${t[0]}" aria-current="${S.tab===t[0]}">${t[1]}</button>`).join('');
+  $('#chips').innerHTML=S.cibs.map((c,i)=>`<span class="chip"${i===S.act?' style="outline:2px solid var(--accent)"':''}><a href="#" data-act="${i}" style="color:inherit;text-decoration:none">${esc(c.subject.name)}</a><button data-rm="${i}" aria-label="Remove ${esc(c.subject.name)}">×</button></span>`).join('');
+  if(!S.cibs.length){$('#view').innerHTML='<div class="card sub" style="text-align:center">No CIB loaded yet. Upload a CIB PDF above to see the analysis.</div>';return}
+  $('#view').innerHTML={overview:vOverview,parties:vParties,behaviour:vBehaviour,export:vExport}[S.tab]();
+  history.replaceState(null,'','#'+S.tab);
+}
+
+/* ============ export ============ */
+function exportXlsx(){
+  const c=cur(),m=analyze(c),P=related(),g=groupExposure(),wb=XLSX.utils.book_new(),s=c.subject;
+  const add=(n,rows,w)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=(w||[34,22,18,16,16,14,10,10,12,12]).map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,n)};
+  add('Summary',[['CIBLens report'],['Subject',s.name],['CIB subject code',s.cibId],['Type',s.type],['Report date',s.reportDate],['CIB signal (0-100)',m.signal],['Band',m.band[0]],[],['Metric','BDT'],['Borrower outstanding',m.out],['Funded',m.funded],['Non-funded',m.nonf],['Guarantor exposure',m.gOut],['Total exposure',m.out+m.gOut],['Overdue',m.od],['Classified outstanding',m.badOut],['Group direct exposure (all uploads)',g.direct],['Group contingent (guarantor-only)',g.cont],['Behaviour score',S.stmt?S.stmt.score:'n/a'],['Behaviour grade',S.stmt?S.stmt.grade[0]:'n/a']]);
+  add('Contracts',[['CIB subject','Type','Role','Limit','Outstanding','Overdue','Class','Status','Start','End','Contract ID']].concat(c.facilities.map(f=>[f.subjName,f.type,f.role,f.limit,f.out,f.od,f.cls==='UC'?'STD':f.cls,f.live?'Live':'Closed',f.start,f.end,f.id])));
+  add('Related parties',[['Party','CIB subject','Relationship','Contracts','Live outstanding','CIB uploaded']].concat(P.map(p=>[p.name,p.code,p.rel.join('; '),p.n,p.out,p.has?'Yes':'Missing'])));
+  add('Concerns',[['Concern','Kind','CIB code','Borrower outstanding','Funded','Non-funded','Guarantor exposure','Overdue','Live contracts']].concat(concerns().map(x=>[x.name,x.kind,x.code,x.out,x.funded,x.nonf,x.gOut,x.od,x.fs.filter(f=>f.live).length])),[34,22,16,18,16,16,18,14,14]);
+  add('Risk flags',[['Severity','Observation']].concat(m.flags.map(f=>[f[0].toUpperCase(),f[1]])),[10,120]);
+  if(S.stmt)add('Behaviour',[['Component','Score','Max','Basis']].concat(S.stmt.cp.map(x=>[x.n,x.v,x.max,x.why])).concat([[],['Month','Avg balance','Credits','Debits','Limit-breach days']]).concat(S.stmt.ms.map(x=>[x.k,Math.round(x.avg),x.cr,x.dr,x.ov])),[34,16,16,16,40]);
+  XLSX.writeFile(wb,'CIBLens_'+s.cibId+'.xlsx');
+}
+
+/* ============ events ============ */
+function addCib(c){const i=S.cibs.findIndex(x=>x.subject.cibId===c.subject.cibId);if(i>=0){S.cibs[i]=c;S.act=i}else{S.cibs.push(c);S.act=S.cibs.length-1}}
+async function onFiles(files){
+  for(const f of files){try{say('Reading '+f.name+'…');
+    addCib(/\.json$/i.test(f.name)?JSON.parse(await f.text()):await readPdf(f))}catch(e){say(f.name+': '+e.message,1);render();return}}
+  say(S.cibs.length+' CIB report(s) loaded. Add related parties’ CIBs to build the group view.');render()}
+function loadStmt(raw){try{const rows=stmtRows(raw);S.rows=rows;S.stmt=scoreStmt(rows,S.limit);say('Statement scored: '+rows.length+' transactions.');render()}catch(e){say(e.message,1)}}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-scope],[data-act],[data-rm],#xl,#stmtDemo,#stmtTpl');if(!t)return;
+  if(t.dataset.tab){S.tab=t.dataset.tab;render();scrollTo(0,0)}
+  else if(t.dataset.scope){S.scope=t.dataset.scope;render()}
+  else if(t.dataset.act!==undefined){e.preventDefault();S.act=+t.dataset.act;render()}
+  else if(t.dataset.rm!==undefined){S.cibs.splice(+t.dataset.rm,1);S.act=0;render()}
+  else if(t.id==='xl')exportXlsx();
+  else if(t.id==='stmtDemo'){const lim=S.limit||165e6;S.limit=lim;S.rows=sampleStmt();S.stmt=scoreStmt(S.rows,lim);render()}
+  else if(t.id==='stmtTpl'){const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Date','Description','Debit','Credit','Balance'],['2026-01-05','Customer receipt',0,2500000,120000000]]),'Statement');XLSX.writeFile(wb,'CIBLens_statement_template.xlsx')}});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.id==='pdf')onFiles([...t.files]);
+  else if(t.id==='stmt'&&t.files[0]){const f=t.files[0],r=new FileReader();r.onload=ev=>{const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});loadStmt(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}))};r.readAsArrayBuffer(f)}
+  else if(t.id==='lim'){S.limit=+t.value||0;if(S.rows){S.stmt=scoreStmt(S.rows,S.limit);render()}}});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const p=e.target.selectionStart;render();const q=$('#q');q.focus();q.setSelectionRange(p,p)}});
+$('#drop').addEventListener('dragover',e=>e.preventDefault());$('#drop').addEventListener('drop',e=>{e.preventDefault();onFiles([...e.dataTransfer.files])});
+const h=location.hash.slice(1);if(['overview','parties','behaviour','export'].includes(h))S.tab=h;
+S.cibs=[];render();
+</script>
+</body>
+</html>
